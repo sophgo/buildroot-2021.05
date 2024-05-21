@@ -1,0 +1,26 @@
+config BR2_PACKAGE_SOPHGO
+	bool "sophgo package"
+	depends on BR2_INSTALL_LIBSTDCPP
+	depends on BR2_TOOLCHAIN_USES_GLIBC
+	depends on BR2_aarch64
+	help
+	  Install the package.
+
+if BR2_PACKAGE_SOPHGO
+
+config BR2_PACKAGE_SOPHGO_BMLIB
+	string "bmlib lib on sophgo platform"
+	default n
+
+config BR2_PACKAGE_SOPHGO_BMVID
+	string "bmvid lib on sophgo platform"
+	default n
+
+config BR2_PACKAGE_SOPHGO_BMCV
+	string "bmcv lib on sophgo platform"
+	default n
+
+endif
+
+comment "sophgo pakages needs a glibc toolchain w/ C++, threads"
+	depends on BR2_aarch64

@@ -6,7 +6,7 @@
 
 OPENSBI_VERSION = $(call qstrip,$(BR2_TARGET_OPENSBI_VERSION))
 
-ifeq ($(OPENSBI_VERSION),custom)
+ifeq ($(BR2_TARGET_OPENSBI_CUSTOM_TARBALL),y)
 # Handle custom OpenSBI tarballs as specified by the configuration
 OPENSBI_TARBALL = $(call qstrip,$(BR2_TARGET_OPENSBI_CUSTOM_TARBALL_LOCATION))
 OPENSBI_SITE = $(patsubst %/,%,$(dir $(OPENSBI_TARBALL)))
@@ -31,7 +31,8 @@ BR_NO_CHECK_HASH_FOR += $(OPENSBI_SOURCE)
 endif
 
 OPENSBI_MAKE_ENV = \
-	CROSS_COMPILE=$(TARGET_CROSS)
+	CROSS_COMPILE=$(TARGET_CROSS) \
+	$(call qstrip,$(BR2_TARGET_OPENSBI_ADDITIONAL_VARIABLES))
 
 OPENSBI_PLAT = $(call qstrip,$(BR2_TARGET_OPENSBI_PLAT))
 ifneq ($(OPENSBI_PLAT),)
@@ -46,6 +47,9 @@ endif
 ifeq ($(BR2_TARGET_OPENSBI_UBOOT_PAYLOAD),y)
 OPENSBI_DEPENDENCIES += uboot
 OPENSBI_MAKE_ENV += FW_PAYLOAD_PATH="$(BINARIES_DIR)/u-boot.bin"
+ifeq ($(BR2_TARGET_OPENSBI_FW_FDT_PATH),y)
+OPENSBI_MAKE_ENV += FW_FDT_PATH="$(BINARIES_DIR)/u-boot.dtb"
+endif
 endif
 
 define OPENSBI_BUILD_CMDS
@@ -67,6 +71,7 @@ OPENSBI_INSTALL_IMAGES = YES
 OPENSBI_FW_IMAGES += payload
 endif
 
+ifneq ($(OPENSBI_PLAT),)
 define OPENSBI_INSTALL_IMAGES_CMDS
 	$(foreach f,$(OPENSBI_FW_IMAGES),\
 		$(INSTALL) -m 0644 -D $(@D)/build/platform/$(OPENSBI_PLAT)/firmware/fw_$(f).bin \
@@ -75,6 +80,7 @@ define OPENSBI_INSTALL_IMAGES_CMDS
 			$(BINARIES_DIR)/fw_$(f).elf
 	)
 endef
+endif
 
 # libsbi.a is not a library meant to be linked in user-space code, but
 # with bare metal code, which is why we don't install it in

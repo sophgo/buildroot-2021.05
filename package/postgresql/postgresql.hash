@@ -1,5 +1,4 @@
-# From https://ftp.postgresql.org/pub/source/v13.3/postgresql-13.3.tar.bz2.sha256
-sha256  3cd9454fa8c7a6255b6743b767700925ead1b9ab0d7a0f9dcb1151010f8eb4a1  postgresql-13.3.tar.bz2
-
+# From https://ftp.postgresql.org/pub/source/v15.6/postgresql-15.6.tar.bz2.sha256
+sha256  8455146ed9c69c93a57de954aead0302cafad035c2b242175d6aa1e17ebcb2fb  postgresql-15.6.tar.bz2
 # License file, Locally calculated
-sha256  31ccadc0a70e8e0e8a35c5833567b64388dfe34987d962e1911554e271294105  COPYRIGHT
+sha256  9bf20ee493926a7e17a74bc7f05089fbc014269667b1540bc35a6b194a40c9de  COPYRIGHT

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-GD_VERSION = 2.3.2
+GD_VERSION = 2.3.3
 GD_SOURCE = libgd-$(GD_VERSION).tar.xz
 GD_SITE = https://github.com/libgd/libgd/releases/download/gd-$(GD_VERSION)
 GD_INSTALL_STAGING = YES
@@ -42,6 +42,13 @@ endif
 ifeq ($(BR2_PACKAGE_JPEG),y)
 GD_DEPENDENCIES += jpeg
 GD_CONF_OPTS += --with-jpeg
+endif
+
+ifeq ($(BR2_PACKAGE_LIBHEIF),y)
+GD_DEPENDENCIES += libheif
+GD_CONF_OPTS += --with-heif
+else
+GD_CONF_OPTS += --without-heif
 endif
 
 ifeq ($(BR2_PACKAGE_LIBPNG),y)

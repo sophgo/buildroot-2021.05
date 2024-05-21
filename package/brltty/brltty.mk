@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-BRLTTY_VERSION = 6.3
+BRLTTY_VERSION = 6.6
 BRLTTY_SOURCE = brltty-$(BRLTTY_VERSION).tar.xz
 BRLTTY_SITE = http://brltty.com/archive
 BRLTTY_INSTALL_STAGING_OPTS = INSTALL_ROOT=$(STAGING_DIR) install
@@ -23,8 +23,10 @@ BRLTTY_CONF_ENV = \
 	PKG_CONFIG_FOR_BUILD=$(HOST_DIR)/bin/pkgconf
 
 BRLTTY_CONF_OPTS = \
+	--disable-emacs-bindings \
 	--disable-java-bindings \
 	--disable-lisp-bindings \
+	--disable-lua-bindings \
 	--disable-ocaml-bindings \
 	--disable-python-bindings \
 	--disable-tcl-bindings \
@@ -129,12 +131,12 @@ BRLTTY_POST_INSTALL_TARGET_HOOKS += BRLTTY_INSTALL_CONF
 
 define BRLTTY_INSTALL_INIT_SYSV
 	$(INSTALL) -D -m 0755 package/brltty/S10brltty \
-		   $(TARGET_DIR)/etc/init.d/S10brltty
+		$(TARGET_DIR)/etc/init.d/S10brltty
 endef
 
 define BRLTTY_INSTALL_INIT_SYSTEMD
 	$(INSTALL) -D -m 0644 package/brltty/brltty.service \
-		   $(TARGET_DIR)/usr/lib/systemd/system/brltty.service
+		$(TARGET_DIR)/usr/lib/systemd/system/brltty.service
 endef
 
 $(eval $(autotools-package))

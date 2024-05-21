@@ -4,12 +4,10 @@
 #
 ################################################################################
 
-LINUX_FIRMWARE_VERSION = 20201022
-LINUX_FIRMWARE_SITE = http://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
-LINUX_FIRMWARE_SITE_METHOD = git
+LINUX_FIRMWARE_VERSION = 20231030
+LINUX_FIRMWARE_SOURCE = linux-firmware-$(LINUX_FIRMWARE_VERSION).tar.xz
+LINUX_FIRMWARE_SITE = $(BR2_KERNEL_MIRROR)/linux/kernel/firmware
 LINUX_FIRMWARE_INSTALL_IMAGES = YES
-
-LINUX_FIRMWARE_CPE_ID_VENDOR = kernel
 
 # Intel SST DSP
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_INTEL_SST_DSP),y)
@@ -65,13 +63,21 @@ LINUX_FIRMWARE_FILES += qca/rampatch_usb_00000302.bin qca/nvm_usb_00000302.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENSE.qcom
 endif
 
+# Qualcomm Atheros QCA9377 Bluetooth
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_QUALCOMM_9377_BT),y)
+LINUX_FIRMWARE_FILES += qca/rampatch_00230302.bin qca/nvm_00230302.bin
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENSE.qcom
+endif
+
 # Realtek 87xx Bluetooth
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_RTL_87XX_BT),y)
 LINUX_FIRMWARE_FILES += \
 	rtl_bt/rtl8723a_fw.bin rtl_bt/rtl8723b_fw.bin \
 	rtl_bt/rtl8723bs_config-OBDA8723.bin \
 	rtl_bt/rtl8723bs_fw.bin rtl_bt/rtl8723d_config.bin \
-	rtl_bt/rtl8723d_fw.bin rtl_bt/rtl8761a_fw.bin
+	rtl_bt/rtl8723d_fw.bin rtl_bt/rtl8761a_fw.bin \
+	rtl_bt/rtl8761b_fw.bin rtl_bt/rtl8761b_config.bin \
+	rtl_bt/rtl8761bu_fw.bin rtl_bt/rtl8761bu_config.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.rtlwifi_firmware.txt
 endif
 
@@ -107,27 +113,37 @@ endif
 # rtl81xx
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_RTL_81XX),y)
 LINUX_FIRMWARE_FILES += \
-	rtlwifi/rtl8192cfw.bin rtlwifi/rtl8192cfwU.bin \
-	rtlwifi/rtl8192cfwU_B.bin rtlwifi/rtl8192cufw.bin \
-	rtlwifi/rtl8192defw.bin rtlwifi/rtl8192sefw.bin \
-	rtlwifi/rtl8188efw.bin rtlwifi/rtl8188eufw.bin \
+	rtlwifi/rtl8192cfw.bin \
+	rtlwifi/rtl8192cfwU.bin \
+	rtlwifi/rtl8192cfwU_B.bin \
+	rtlwifi/rtl8192cufw.bin \
+	rtlwifi/rtl8192defw.bin \
+	rtlwifi/rtl8192sefw.bin \
+	rtlwifi/rtl8188efw.bin \
+	rtlwifi/rtl8188eufw.bin \
 	rtlwifi/rtl8192cufw_A.bin \
-	rtlwifi/rtl8192cufw_B.bin rtlwifi/rtl8192cufw_TMSC.bin \
-	rtlwifi/rtl8192eefw.bin rtlwifi/rtl8192eu_ap_wowlan.bin \
-	rtlwifi/rtl8192eu_nic.bin rtlwifi/rtl8192eu_wowlan.bin
+	rtlwifi/rtl8192cufw_B.bin \
+	rtlwifi/rtl8192cufw_TMSC.bin \
+	rtlwifi/rtl8192eu_ap_wowlan.bin \
+	rtlwifi/rtl8192eu_nic.bin \
+	rtlwifi/rtl8192eu_wowlan.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.rtlwifi_firmware.txt
 endif
 
 # rtl87xx
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_RTL_87XX),y)
 LINUX_FIRMWARE_FILES += \
-	rtlwifi/rtl8712u.bin rtlwifi/rtl8723fw.bin \
-	rtlwifi/rtl8723fw_B.bin rtlwifi/rtl8723befw.bin \
-	rtlwifi/rtl8723aufw_A.bin rtlwifi/rtl8723aufw_B.bin \
-	rtlwifi/rtl8723aufw_B_NoBT.bin rtlwifi/rtl8723befw.bin \
-	rtlwifi/rtl8723bs_ap_wowlan.bin rtlwifi/rtl8723bs_bt.bin \
-	rtlwifi/rtl8723bs_nic.bin rtlwifi/rtl8723bs_wowlan.bin \
-	rtlwifi/rtl8723bu_ap_wowlan.bin rtlwifi/rtl8723bu_nic.bin \
+	rtlwifi/rtl8712u.bin \
+	rtlwifi/rtl8723fw.bin \
+	rtlwifi/rtl8723fw_B.bin \
+	rtlwifi/rtl8723befw.bin \
+	rtlwifi/rtl8723aufw_A.bin \
+	rtlwifi/rtl8723aufw_B.bin \
+	rtlwifi/rtl8723aufw_B_NoBT.bin \
+	rtlwifi/rtl8723befw.bin \
+	rtlwifi/rtl8723bs_bt.bin \
+	rtlwifi/rtl8723bu_ap_wowlan.bin \
+	rtlwifi/rtl8723bu_nic.bin \
 	rtlwifi/rtl8723bu_wowlan.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.rtlwifi_firmware.txt
 endif
@@ -144,9 +160,7 @@ endif
 # rtw88
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_RTL_RTW88),y)
 LINUX_FIRMWARE_FILES += \
-	rtw88/rtw8723d_fw.bin \
-	rtw88/rtw8822b_fw.bin \
-	rtw88/rtw8822c_fw.bin
+	rtw88/rtw*.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.rtlwifi_firmware.txt
 endif
 
@@ -332,7 +346,7 @@ endif
 
 # MT7601
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_MEDIATEK_MT7601U),y)
-LINUX_FIRMWARE_FILES += mt7601u.bin
+LINUX_FIRMWARE_FILES += mediatek/mt7601u.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.ralink_a_mediatek_company_firmware
 endif
 
@@ -344,13 +358,13 @@ endif
 
 # MT7650
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_MEDIATEK_MT7650),y)
-LINUX_FIRMWARE_FILES += mt7650.bin
+LINUX_FIRMWARE_FILES += mediatek/mt7650.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.ralink_a_mediatek_company_firmware
 endif
 
 # MT76x2e
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_MEDIATEK_MT76X2E),y)
-LINUX_FIRMWARE_FILES += mt7662.bin mt7662_rom_patch.bin
+LINUX_FIRMWARE_FILES += mediatek/mt7662.bin mediatek/mt7662_rom_patch.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.ralink_a_mediatek_company_firmware
 endif
 
@@ -427,6 +441,11 @@ LINUX_FIRMWARE_FILES += wil6210.*
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENSE.QualcommAtheros_ath10k
 endif
 
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_22000),y)
+LINUX_FIRMWARE_FILES += iwlwifi-QuZ-*.ucode iwlwifi-Qu-*.ucode
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
+endif
+
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_22260),y)
 LINUX_FIRMWARE_FILES += iwlwifi-cc-a0-*.ucode
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
@@ -439,6 +458,16 @@ endif
 
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3168),y)
 LINUX_FIRMWARE_FILES += iwlwifi-3168-*.ucode
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
+endif
+
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_3945),y)
+LINUX_FIRMWARE_FILES += iwlwifi-3945-2.ucode
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
+endif
+
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_4965),y)
+LINUX_FIRMWARE_FILES += iwlwifi-4965-2.ucode
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
 endif
 
@@ -491,8 +520,24 @@ LINUX_FIRMWARE_FILES += iwlwifi-9???-*.ucode
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
 endif
 
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_6E),y)
+LINUX_FIRMWARE_FILES += iwlwifi-so-a0-gf-a0*.{ucode,pnvm}
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
+endif
+
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_IWLWIFI_QUZ),y)
+LINUX_FIRMWARE_FILES += iwlwifi-QuZ-*.ucode
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.iwlwifi_firmware
+endif
+
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_BROADCOM_TIGON3),y)
 LINUX_FIRMWARE_FILES += tigon/*
+# No license file; the license is in the file WHENCE
+# which is installed unconditionally
+endif
+
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_BNX2),y)
+LINUX_FIRMWARE_FILES += bnx2/*
 # No license file; the license is in the file WHENCE
 # which is installed unconditionally
 endif
@@ -518,6 +563,11 @@ LINUX_FIRMWARE_FILES += e100/*.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.e100
 endif
 
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_INTEL_ICE),y)
+LINUX_FIRMWARE_FILES += intel/ice/ddp/*.pkg
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENSE.ice_enhanced
+endif
+
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_MICROCHIP_VSC85XX_PHY),y)
 LINUX_FIRMWARE_FILES += microchip/mscc_vsc85*.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.microchip
@@ -530,6 +580,19 @@ LINUX_FIRMWARE_FILES += \
 # which is installed unconditionally
 endif
 
+# rtl815x
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_RTL_815X),y)
+LINUX_FIRMWARE_FILES += \
+	rtl_nic/rtl8153a-2.fw \
+	rtl_nic/rtl8153a-3.fw \
+	rtl_nic/rtl8153a-4.fw \
+	rtl_nic/rtl8153b-2.fw \
+	rtl_nic/rtl8153c-1.fw \
+	rtl_nic/rtl8156a-2.fw \
+	rtl_nic/rtl8156b-2.fw
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.rtlwifi_firmware.txt
+endif
+
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_RTL_8169),y)
 LINUX_FIRMWARE_FILES += \
 	rtl_nic/rtl8105e-1.fw \
@@ -538,6 +601,7 @@ LINUX_FIRMWARE_FILES += \
 	rtl_nic/rtl8107e-1.fw \
 	rtl_nic/rtl8107e-2.fw \
 	rtl_nic/rtl8125a-3.fw \
+	rtl_nic/rtl8125b-2.fw \
 	rtl_nic/rtl8168d-1.fw \
 	rtl_nic/rtl8168d-2.fw \
 	rtl_nic/rtl8168e-1.fw \
@@ -553,6 +617,12 @@ LINUX_FIRMWARE_FILES += \
 	rtl_nic/rtl8402-1.fw \
 	rtl_nic/rtl8411-1.fw \
 	rtl_nic/rtl8411-2.fw
+endif
+
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_MARVELL_PRESTERA),y)
+LINUX_FIRMWARE_FILES += \
+	mrvl/prestera/mvsw_prestera_fw*.img
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.Marvell
 endif
 
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_XCx000),y)
@@ -590,26 +660,45 @@ endif
 # brcm43xx
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_BRCM_BCM43XX),y)
 LINUX_FIRMWARE_FILES += \
-	brcm/bcm43xx-0.fw brcm/bcm43xx_hdr-0.fw \
-	brcm/bcm4329-fullmac-4.bin brcm/brcmfmac4329-sdio.bin \
-	brcm/brcmfmac4330-sdio.bin brcm/brcmfmac4334-sdio.bin \
-	brcm/brcmfmac4335-sdio.bin brcm/brcmfmac4339-sdio.bin \
-	brcm/brcmfmac4350-pcie.bin brcm/brcmfmac4354-sdio.bin \
-	brcm/brcmfmac4356-pcie.bin brcm/brcmfmac4371-pcie.bin
+	brcm/bcm4329-fullmac-4.bin \
+	brcm/brcmfmac4329-sdio.bin \
+	brcm/brcmfmac4330-sdio.bin \
+	brcm/brcmfmac4334-sdio.bin \
+	brcm/brcmfmac4335-sdio.bin \
+	brcm/brcmfmac4350c2-pcie.bin \
+	brcm/brcmfmac4350-pcie.bin \
+	brcm/brcmfmac4358-pcie.bin \
+	brcm/brcmfmac4371-pcie.bin \
+	brcm/brcmfmac4373.bin \
+	brcm/brcmfmac4330-sdio.Prowise-PT301.txt \
+	brcm/brcmfmac4356-pcie.gpd-win-pocket.txt \
+	brcm/brcmfmac4356-sdio.AP6356S.txt
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.broadcom_bcm43xx
 endif
 
 # brcm43xxx
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_BRCM_BCM43XXX),y)
 LINUX_FIRMWARE_FILES += \
-	brcm/brcmfmac43143.bin brcm/brcmfmac43143-sdio.bin \
-	brcm/brcmfmac43236b.bin brcm/brcmfmac43241b0-sdio.bin \
-	brcm/brcmfmac43241b4-sdio.bin brcm/brcmfmac43241b5-sdio.bin \
-	brcm/brcmfmac43242a.bin brcm/brcmfmac43340-sdio.bin \
-	brcm/brcmfmac43362-sdio.bin brcm/brcmfmac43430-sdio.bin \
-	brcm/brcmfmac43430a0-sdio.bin brcm/brcmfmac43455-sdio.bin \
-	brcm/brcmfmac43569.bin brcm/brcmfmac43570-pcie.bin \
-	brcm/brcmfmac43602-pcie.ap.bin brcm/brcmfmac43602-pcie.bin \
+	brcm/brcmfmac43143.bin \
+	brcm/brcmfmac43143-sdio.bin \
+	brcm/brcmfmac43236b.bin \
+	brcm/brcmfmac43241b0-sdio.bin \
+	brcm/brcmfmac43241b4-sdio.bin \
+	brcm/brcmfmac43241b5-sdio.bin \
+	brcm/brcmfmac43242a.bin \
+	brcm/brcmfmac43430a0-sdio.bin \
+	brcm/brcmfmac43569.bin \
+	brcm/brcmfmac43602-pcie.ap.bin \
+	brcm/brcmfmac43602-pcie.bin \
+	brcm/brcmfmac43340-sdio.meegopad-t08.txt \
+	brcm/brcmfmac43340-sdio.pov-tab-p1006w-data.txt \
+	brcm/brcmfmac43340-sdio.predia-basic.txt \
+	brcm/brcmfmac43362-sdio.cubietech,cubietruck.txt \
+	brcm/brcmfmac43430a0-sdio.ilife-S806.txt \
+	brcm/brcmfmac43430a0-sdio.jumper-ezpad-mini3.txt \
+	brcm/brcmfmac43430-sdio.AP6212.txt \
+	brcm/brcmfmac43430-sdio.Hampoo-D2D3_Vi8A1.txt \
+	brcm/brcmfmac43430-sdio.MUR1DX.txt \
 	brcm/brcmfmac43430-sdio.raspberrypi,3-model-b.txt \
 	brcm/brcmfmac43455-sdio.raspberrypi,3-model-b-plus.txt \
 	brcm/brcmfmac43455-sdio.raspberrypi,4-model-b.txt
@@ -618,16 +707,53 @@ endif
 
 # brcm4366b1
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_BRCM_BCM4366B1),y)
-LINUX_FIRMWARE_FILES += \
-	brcm/brcmfmac4366b-pcie.bin brcm/brcmfmac4366b-pcie.bin
+LINUX_FIRMWARE_FILES += brcm/brcmfmac4366b-pcie.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.broadcom_bcm43xx
 endif
 
 # brcm4366c0
 ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_BRCM_BCM4366C0),y)
-LINUX_FIRMWARE_FILES += \
-	brcm/brcmfmac4366c-pcie.bin brcm/brcmfmac4366c-pcie.bin
+LINUX_FIRMWARE_FILES += brcm/brcmfmac4366c-pcie.bin
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.broadcom_bcm43xx
+endif
+
+# cyfmac43xx
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_CYPRESS_CYW43XX),y)
+LINUX_FIRMWARE_FILES += \
+	cypress/cyfmac4339-sdio.bin \
+	cypress/cyfmac4354-sdio.bin \
+	cypress/cyfmac4354-sdio.clm_blob \
+	cypress/cyfmac4356-pcie.bin \
+	cypress/cyfmac4356-pcie.clm_blob \
+	cypress/cyfmac4356-sdio.bin \
+	cypress/cyfmac4356-sdio.clm_blob \
+	cypress/cyfmac4373-sdio.bin \
+	cypress/cyfmac4373-sdio.clm_blob
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.cypress
+endif
+
+# cyfmac43xxx
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_CYPRESS_CYW43XXX),y)
+LINUX_FIRMWARE_FILES += \
+	cypress/cyfmac43012-sdio.bin \
+	cypress/cyfmac43012-sdio.clm_blob \
+	cypress/cyfmac43340-sdio.bin \
+	cypress/cyfmac43362-sdio.bin \
+	cypress/cyfmac43430-sdio.bin \
+	cypress/cyfmac43430-sdio.clm_blob \
+	cypress/cyfmac43455-sdio.bin \
+	cypress/cyfmac43455-sdio.clm_blob \
+	cypress/cyfmac43570-pcie.bin \
+	cypress/cyfmac43570-pcie.clm_blob
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.cypress
+endif
+
+# cyfmac54xxx
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_CYPRESS_CYW54XXX),y)
+LINUX_FIRMWARE_FILES += \
+	cypress/cyfmac54591-pcie.bin \
+	cypress/cyfmac54591-pcie.clm_blob
+LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.cypress
 endif
 
 # ql2xxx
@@ -672,6 +798,12 @@ LINUX_FIRMWARE_FILES += ti_3410.fw ti_5052.fw \
 LINUX_FIRMWARE_ALL_LICENSE_FILES += LICENCE.moxa
 endif
 
+ifeq ($(BR2_PACKAGE_LINUX_FIRMWARE_CX231XX),y)
+LINUX_FIRMWARE_FILES += v4l-cx231xx-avcore-01.fw
+# No license file; the license is in the file WHENCE
+# which is installed unconditionally
+endif
+
 ifneq ($(LINUX_FIRMWARE_FILES)$(LINUX_FIRMWARE_DIRS),)
 
 define LINUX_FIRMWARE_BUILD_CMDS
@@ -710,9 +842,9 @@ define LINUX_FIRMWARE_INSTALL_FW
 	cd $(1) ; \
 	sed -r -e '/^Link: (.+) -> (.+)$$/!d; s//\1 \2/' $(@D)/WHENCE | \
 	while read f d; do \
-		if test -f $$(readlink -m $$(dirname $$f)/$$d); then \
-			mkdir -p $$(dirname $$f) || exit 1; \
-			ln -sf $$d $$f || exit 1; \
+		if test -f $$(readlink -m $$(dirname "$$f")/$$d); then \
+			mkdir -p $$(dirname "$$f") || exit 1; \
+			ln -sf $$d "$$f" || exit 1; \
 		fi ; \
 	done
 endef

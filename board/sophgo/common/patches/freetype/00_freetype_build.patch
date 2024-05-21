@@ -1,0 +1,17 @@
+--- a/Makefile	2023-02-27 13:39:44.000000000 +0800
++++ b/Makefile	2024-04-29 14:14:16.038322045 +0800
+@@ -21,12 +21,12 @@
+ # The variable TOP_DIR holds the path to the topmost directory in the project
+ # engine source hierarchy.  If it is not defined, default it to `.'.
+ #
+-TOP_DIR ?= .
++TOP_DIR = .
+ 
+ # The variable OBJ_DIR gives the location where object files and the
+ # FreeType library are built.
+ #
+-OBJ_DIR ?= $(TOP_DIR)/objs
++OBJ_DIR = $(TOP_DIR)/objs
+ 
+ 
+ include $(TOP_DIR)/builds/toplevel.mk

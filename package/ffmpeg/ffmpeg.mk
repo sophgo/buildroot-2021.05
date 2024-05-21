@@ -4,10 +4,9 @@
 #
 ################################################################################
 
-FFMPEG_VERSION = 4.4
-FFMPEG_SOURCE = ffmpeg-$(FFMPEG_VERSION).tar.xz
-FFMPEG_SITE = http://ffmpeg.org/releases
-FFMPEG_INSTALL_STAGING = YES
+FFMPEG_VERSION = 2a2c848f51deb1acda66894997dd4cc6f5b53c00
+FFMPEG_SITE = https://github.com/sophgo/sophon_ffmpeg.git
+FFMPEG_SITE_METHOD = git
 
 FFMPEG_LICENSE = LGPL-2.1+, libjpeg license
 FFMPEG_LICENSE_FILES = LICENSE.md COPYING.LGPLv2.1
@@ -93,11 +92,11 @@ else
 FFMPEG_CONF_OPTS += --disable-libv4l2
 endif
 
-ifeq ($(BR2_PACKAGE_FFMPEG_AVRESAMPLE),y)
-FFMPEG_CONF_OPTS += --enable-avresample
-else
-FFMPEG_CONF_OPTS += --disable-avresample
-endif
+# ifeq ($(BR2_PACKAGE_FFMPEG_AVRESAMPLE),y)
+# FFMPEG_CONF_OPTS += --enable-avresample
+# else
+# FFMPEG_CONF_OPTS += --disable-avresample
+# endif
 
 ifeq ($(BR2_PACKAGE_FFMPEG_FFPROBE),y)
 FFMPEG_CONF_OPTS += --enable-ffprobe
@@ -282,9 +281,14 @@ FFMPEG_CONF_OPTS += --disable-vdpau
 endif
 
 ifeq ($(BR2_PACKAGE_RPI_USERLAND),y)
-FFMPEG_CONF_OPTS += --enable-mmal --enable-omx --enable-omx-rpi \
+FFMPEG_CONF_OPTS += --enable-omx --enable-omx-rpi \
 	--extra-cflags=-I$(STAGING_DIR)/usr/include/IL
 FFMPEG_DEPENDENCIES += rpi-userland
+ifeq ($(BR2_arm),y)
+FFMPEG_CONF_OPTS += --enable-mmal
+else
+FFMPEG_CONF_OPTS += --disable-mmal
+endif
 else
 FFMPEG_CONF_OPTS += --disable-mmal --disable-omx --disable-omx-rpi
 endif
@@ -378,12 +382,12 @@ endif
 # ffmpeg freetype support require fenv.h which is only
 # available/working on glibc.
 # The microblaze variant doesn't provide the needed exceptions
-ifeq ($(BR2_PACKAGE_FREETYPE)$(BR2_TOOLCHAIN_USES_GLIBC)x$(BR2_microblaze),yyx)
-FFMPEG_CONF_OPTS += --enable-libfreetype
-FFMPEG_DEPENDENCIES += freetype
-else
-FFMPEG_CONF_OPTS += --disable-libfreetype
-endif
+# ifeq ($(BR2_PACKAGE_FREETYPE)$(BR2_TOOLCHAIN_USES_GLIBC)x$(BR2_microblaze),yyx)
+# FFMPEG_CONF_OPTS += --enable-libfreetype
+# FFMPEG_DEPENDENCIES += freetype
+# else
+# FFMPEG_CONF_OPTS += --disable-libfreetype
+# endif
 
 ifeq ($(BR2_PACKAGE_FONTCONFIG),y)
 FFMPEG_CONF_OPTS += --enable-fontconfig
@@ -507,13 +511,15 @@ else
 FFMPEG_CONF_OPTS += --enable-mipsfpu
 endif
 
-# Fix build failure on "addi opcode not supported"
-ifeq ($(BR2_mips_32r6)$(BR2_mips_64r6),y)
+# Fix build failure on several missing assembly instructions
 FFMPEG_CONF_OPTS += --disable-asm
-endif
 endif # MIPS
 
-ifeq ($(BR2_POWERPC_CPU_HAS_ALTIVEC),y)
+ifeq ($(BR2_POWERPC_CPU_HAS_ALTIVEC):$(BR2_powerpc64le),y:)
+FFMPEG_CONF_OPTS += --enable-altivec
+else ifeq ($(BR2_POWERPC_CPU_HAS_VSX):$(BR2_powerpc64le),y:y)
+# On LE, ffmpeg AltiVec support needs VSX intrinsics, and VSX
+# is an extension to AltiVec.
 FFMPEG_CONF_OPTS += --enable-altivec
 else
 FFMPEG_CONF_OPTS += --disable-altivec
@@ -540,12 +546,45 @@ else ifneq ($(GCC_TARGET_ARCH),)
 FFMPEG_CONF_OPTS += --cpu="$(GCC_TARGET_ARCH)"
 endif
 
+
+# ifeq ($(BR2_ENABLE_SOPH_ACC),y)
+FFMPEG_CONF_OPTS += --enable-encoder=h264_bm --enable-encoder=h265_bm --enable-bmcodec --disable-encoder=bmx264
+FFMPEG_CONF_OPTS += --enable-decoder=h264_bm --enable-decoder=h265_bm --enable-encoder=jpeg_bm --enable-decoder=jpeg_bm
+EXTRA_LIBS += -lgb28181_sip
+EXTRA_LIBS += -lbmlib -lbmjpeg -lbmvd -lbmvenc -lbmcv
+EXTRA_LIBS += -lispv4l2_helper -lae -laf -lawb -lcvi_bin -lcvi_bin_isp -lcvi_ispd2 -lisp -lisp_algo -lispv4l2_adapter -ljson-c -lsns_full
+EXTRA_CFLAGS += -I$(@D)/extern_lib/hardware/jpeg/include/ \
+				 -I$(@D)/extern_lib/hardware/video/enc/include/ \
+				 -I$(@D)/extern_lib/hardware/video/dec/include/ \
+				 -I$(@D)/extern_lib/hardware/bmcv/include/ \
+				 -I$(@D)/extern_lib/3rdparty/libbmlib/include/ \
+				 -I$(@D)/extern_lib/3rdparty/libisp/include/ \
+				 -I$(@D)/extern_lib/3rdparty/osdrv/ \
+				 -I$(@D)/extern_lib/prebuilt/include \
+				 -I$(@D)/extern_lib/prebuilt/include/gbclient \
+				 -I$(@D)/extern_lib/prebuilt/include/freetype2
+EXTRA_CFLAGS += -DBM1688 -DBM1684
+EXTRA_LDFLAGS += -L$(@D)/extern_lib/hardware/jpeg/lib/ \
+				 -L$(@D)/extern_lib/hardware/video/enc/lib/ \
+				 -L$(@D)/extern_lib/hardware/video/dec/lib/ \
+				 -L$(@D)/extern_lib/hardware/bmcv/lib/ \
+				 -L$(@D)/extern_lib/prebuilt/lib/ \
+				 -L$(@D)/extern_lib/3rdparty/libbmlib/lib/ \
+				 -L$(@D)/extern_lib/3rdparty/libisp/lib/ \
+				 -L$(@D)/extern_lib/3rdparty/libisp/lib/soc/
+# endif
+
 FFMPEG_CFLAGS = $(TARGET_CFLAGS)
 
 ifeq ($(BR2_TOOLCHAIN_HAS_GCC_BUG_85180),y)
 FFMPEG_CONF_OPTS += --disable-optimizations
 FFMPEG_CFLAGS += -O0
 endif
+
+ifeq ($(BR2_ARM_INSTRUCTIONS_THUMB),y)
+FFMPEG_CFLAGS += -marm
+endif
+
 
 FFMPEG_CONF_ENV += CFLAGS="$(FFMPEG_CFLAGS)"
 FFMPEG_CONF_OPTS += $(call qstrip,$(BR2_PACKAGE_FFMPEG_EXTRACONF))
@@ -567,12 +606,31 @@ define FFMPEG_CONFIGURE_CMDS
 		--pkg-config="$(PKG_CONFIG_HOST_BINARY)" \
 		$(SHARED_STATIC_LIBS_OPTS) \
 		$(FFMPEG_CONF_OPTS) \
+		--extra_cflags="${EXTRA_CFLAGS}" \
+		--extra-ldflags="${EXTRA_LDFLAGS}" \
+		--extra-libs="${EXTRA_LIBS}" \
+		--extra-version="sophon-${FFMPEG_VERSION}" \
 	)
+endef
+
+define FFMPEG_BUILD_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) clean
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D)
+endef
+
+define FFMPEG_INSTALL_TARGET_CMDS
+	$(TARGET_MAKE_ENV) $(MAKE) -C $(@D) DESTDIR=$(TARGET_DIR) install
 endef
 
 define FFMPEG_REMOVE_EXAMPLE_SRC_FILES
 	rm -rf $(TARGET_DIR)/usr/share/ffmpeg/examples
+	# cp $(@D)/extern_lib/hardware/jpeg/lib/lib*.so* $(TARGET_DIR)/usr/lib
+	# cp $(@D)/extern_lib/hardware/video/enc/lib/lib*.so* $(TARGET_DIR)/usr/lib
+	# cp $(@D)/extern_lib/hardware/video/dec/lib/lib*.so* $(TARGET_DIR)/usr/lib
+	# cp $(@D)/extern_lib/hardware/bmcv/lib/lib*.so* $(TARGET_DIR)/usr/lib
+	# cp $(@D)/extern_lib/3rdparty/libbmlib/lib/lib*.so* $(TARGET_DIR)/usr/lib
+	# cp $(@D)/extern_lib/3rdparty/libdrm/lib/lib*.so* $(TARGET_DIR)/usr/lib
 endef
 FFMPEG_POST_INSTALL_TARGET_HOOKS += FFMPEG_REMOVE_EXAMPLE_SRC_FILES
 
-$(eval $(autotools-package))
+$(eval $(generic-package))

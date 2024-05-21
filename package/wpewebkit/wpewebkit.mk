@@ -4,8 +4,9 @@
 #
 ################################################################################
 
-WPEWEBKIT_VERSION = 2.30.6
-WPEWEBKIT_SITE = http://www.wpewebkit.org/releases
+# The middle number is even for stable releases, odd for development ones.
+WPEWEBKIT_VERSION = 2.42.5
+WPEWEBKIT_SITE = https://wpewebkit.org/releases
 WPEWEBKIT_SOURCE = wpewebkit-$(WPEWEBKIT_VERSION).tar.xz
 WPEWEBKIT_INSTALL_STAGING = YES
 WPEWEBKIT_LICENSE = LGPL-2.1+, BSD-2-Clause
@@ -14,16 +15,21 @@ WPEWEBKIT_LICENSE_FILES = \
 	Source/WebCore/LICENSE-LGPL-2.1
 WPEWEBKIT_CPE_ID_VENDOR = wpewebkit
 WPEWEBKIT_CPE_ID_PRODUCT = wpe_webkit
-WPEWEBKIT_DEPENDENCIES = host-gperf host-python host-ruby \
-	harfbuzz cairo icu jpeg libepoxy libgcrypt libgles libsoup libtasn1 \
+WPEWEBKIT_DEPENDENCIES = host-gperf host-python3 host-ruby host-unifdef \
+	harfbuzz cairo icu jpeg libepoxy libgcrypt libgles libsoup3 libtasn1 \
 	libpng libxslt openjpeg wayland-protocols webp wpebackend-fdo
+
+WPEWEBKIT_CMAKE_BACKEND = ninja
 
 WPEWEBKIT_CONF_OPTS = \
 	-DPORT=WPE \
 	-DENABLE_ACCESSIBILITY=OFF \
 	-DENABLE_API_TESTS=OFF \
+	-DENABLE_DOCUMENTATION=OFF \
+	-DENABLE_INTROSPECTION=OFF \
 	-DENABLE_MINIBROWSER=OFF \
-	-DSILENCE_CROSS_COMPILATION_NOTICES=ON
+	-DENABLE_WEB_RTC=OFF \
+	-DUSE_AVIF=OFF
 
 ifeq ($(BR2_PACKAGE_WPEWEBKIT_SANDBOX),y)
 WPEWEBKIT_CONF_OPTS += \
@@ -39,11 +45,18 @@ ifeq ($(BR2_PACKAGE_WPEWEBKIT_MULTIMEDIA),y)
 WPEWEBKIT_CONF_OPTS += \
 	-DENABLE_VIDEO=ON \
 	-DENABLE_WEB_AUDIO=ON
-WPEWEBKIT_DEPENDENCIES += gstreamer1 gst1-libav gst1-plugins-base gst1-plugins-good
+WPEWEBKIT_DEPENDENCIES += gstreamer1 gst1-libav gst1-plugins-base
 else
 WPEWEBKIT_CONF_OPTS += \
 	-DENABLE_VIDEO=OFF \
 	-DENABLE_WEB_AUDIO=OFF
+endif
+
+ifeq ($(BR2_PACKAGE_WPEWEBKIT_MEDIA_STREAM),y)
+WPEWEBKIT_CONF_OPTS += -DENABLE_MEDIA_STREAM=ON
+WPEWEBKIT_DEPENDENCIES += gst1-plugins-bad
+else
+WPEWEBKIT_CONF_OPTS += -DENABLE_MEDIA_STREAM=OFF
 endif
 
 ifeq ($(BR2_PACKAGE_WPEWEBKIT_USE_GSTREAMER_GL),y)
@@ -58,6 +71,13 @@ else
 WPEWEBKIT_CONF_OPTS += -DENABLE_WEBDRIVER=OFF
 endif
 
+ifeq ($(BR2_PACKAGE_LCMS2),y)
+WPEWEBKIT_CONF_OPTS += -DUSE_LCMS=ON
+WPEWEBKIT_DEPENDENCIES += lcms2
+else
+WPEWEBKIT_CONF_OPTS += -DUSE_LCMS=OFF
+endif
+
 ifeq ($(BR2_PACKAGE_WOFF2),y)
 WPEWEBKIT_CONF_OPTS += -DUSE_WOFF2=ON
 WPEWEBKIT_DEPENDENCIES += woff2
@@ -65,11 +85,25 @@ else
 WPEWEBKIT_CONF_OPTS += -DUSE_WOFF2=OFF
 endif
 
+ifeq ($(BR2_PACKAGE_LIBJXL),y)
+WPEWEBKIT_CONF_OPTS += -DUSE_JPEGXL=ON
+WPEWEBKIT_DEPENDENCIES += libjxl
+else
+WPEWEBKIT_CONF_OPTS += -DUSE_JPEGXL=OFF
+endif
+
 ifeq ($(BR2_INIT_SYSTEMD),y)
-WPEWEBKIT_CONF_OPTS += -DUSE_SYSTEMD=ON
+WPEWEBKIT_CONF_OPTS += -DENABLE_JOURNALD_LOG=ON
 WPEWEBKIT_DEPENDENCIES += systemd
 else
-WPEWEBKIT_CONF_OPTS += -DUSE_SYSTEMD=OFF
+WPEWEBKIT_CONF_OPTS += -DENABLE_JOURNALD_LOG=OFF
+endif
+
+ifeq ($(BR2_PACKAGE_HAS_LIBGBM),y)
+WPEWEBKIT_CONF_OPTS += -DUSE_GBM=ON
+WPEWEBKIT_DEPENDENCIES += libgbm
+else
+WPEWEBKIT_CONF_OPTS += -DUSE_GBM=OFF
 endif
 
 # JIT is not supported for MIPS r6, but the WebKit build system does not
