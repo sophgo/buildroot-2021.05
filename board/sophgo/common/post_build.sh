@@ -22,3 +22,5 @@ mkdir -p $base_dir/var/spool
 mkdir -p $base_dir/root
 mkdir -p $base_dir/run 
 mkdir -p $base_dir/overlay
+mkdir -p $base_dir/etc/ssh
+ssh-keygen -A -f $base_dir
