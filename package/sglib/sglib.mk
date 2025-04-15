@@ -11,11 +11,11 @@ SGLIB_FILES = \
     $(TOPDIR)/../middleware/v2/modules/isp/cv186x/v4l2_adapter/sophon-soc-libisp_*_arm64.tar.gz|isp_test  \
 	$(TOPDIR)/../libsophon/build/libsophon_soc_*_aarch64.tar.gz|libsophon_test
 
-ORI_FLASH_PARTITION_XML = $(TOPDIR)/../build/boards/sophon/edge_buildroot/partition/partition_emmc.xml
-DEST_FLASH_PARTITION_XML = $(TOPDIR)/board/sophgo/common/tools/partition_emmc.xml
-
 BOARD_DIR = $(TOPDIR)/board/sophgo/common/overlay/opt/
 TOOLS_DIR = $(TOPDIR)/board/sophgo/common/tools/
+
+ORI_FLASH_PARTITION_XML = $(TOPDIR)/../build/boards/sophon/edge_buildroot/partition/partition_emmc.xml
+DEST_FLASH_PARTITION_XML = $(TOOLS_DIR)/partition_emmc.xml
 
 define SGLIB_BUILD_CMDS
 
@@ -46,8 +46,11 @@ define SGLIB_BUILD_CMDS
 		cp $(ORI_FLASH_PARTITION_XML) $(TOOLS_DIR)/; \
 	fi
 
+	# Generate /etc/fw_env.config
+	${Q}python3 $(TOOLS_DIR)/mkcvipart.py $(DEST_FLASH_PARTITION_XML) $(TOPDIR)/board/sophgo/common/overlay/etc/ --fw_env
+
 	# Generate S10_automount
-	${Q}python3 $(TOOLS_DIR)/create_automount.py $(TOOLS_DIR)/partition_emmc.xml $(TOPDIR)/board/sophgo/common/overlay/etc/init.d/
+	${Q}python3 $(TOOLS_DIR)/create_automount.py $(DEST_FLASH_PARTITION_XML) $(TOPDIR)/board/sophgo/common/overlay/etc/init.d/
 
 endef
 
