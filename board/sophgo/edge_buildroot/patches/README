@@ -1,0 +1,7 @@
+bm1688 patches
+
+# Ex:
+{package_name}/00_xxx.patch
+{package_name}/01_xxx.patch
+
+will patch to {BUILDROOT_DIR}/packages/{package_name}/

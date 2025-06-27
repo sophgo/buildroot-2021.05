@@ -1,0 +1,198 @@
+#!/bin/sh
+function load_ko()
+{
+	if [ -f /mnt/system/ko/bmtpu.ko ]; then
+		insmod /mnt/system/ko/bmtpu.ko
+	fi
+}
+
+function load_soph_base_ko()
+{
+	echo load soph_base ko ...
+	if [ -f /mnt/system/ko/soph_base.ko ]; then
+		insmod /mnt/system/ko/soph_base.ko
+	fi
+}
+
+function load_soph_2d_engine_ko()
+{
+	echo load soph_2d_engine ko ...
+	if [ -f /mnt/system/ko/soph_2d_engine.ko ]; then
+		insmod /mnt/system/ko/soph_2d_engine.ko
+	fi
+}
+
+function load_soph_pwm_ko()
+{
+	echo load soph_pwm ko ...
+	if [ -f /mnt/system/ko/soph_pwm.ko ]; then
+		insmod /mnt/system/ko/soph_pwm.ko
+	fi
+}
+
+function load_soph_saradc_ko()
+{
+	echo load soph_saradc ko ...
+	if [ -f /mnt/system/ko/soph_saradc.ko ]; then
+		insmod /mnt/system/ko/soph_saradc.ko
+	fi
+}
+
+function load_soph_clock_cooling_ko()
+{
+	echo load soph_clock_cooling ko ...
+	if [ -f /mnt/system/ko/soph_clock_cooling.ko ]; then
+		insmod /mnt/system/ko/soph_clock_cooling.ko
+	fi
+}
+
+function load_soph_dpu_ko()
+{
+	echo load soph_dpu ko ...
+	if [ -f /mnt/system/ko/soph_dpu.ko ]; then
+		insmod /mnt/system/ko/soph_dpu.ko
+	fi
+}
+
+function load_soph_dwa_ko()
+{
+	echo load soph_dwa ko ...
+	if [ -f /mnt/system/ko/soph_dwa.ko ]; then
+		insmod /mnt/system/ko/soph_dwa.ko
+	fi
+}
+
+function load_soph_ive_ko()
+{
+	echo load soph_ive ko ...
+	if [ -f /mnt/system/ko/soph_ive.ko ]; then
+		insmod /mnt/system/ko/soph_ive.ko
+	fi
+}
+
+function load_soph_rtc_ko()
+{
+	echo load soph_rtc ko ...
+	if [ -f /mnt/system/ko/soph_rtc.ko ]; then
+		insmod /mnt/system/ko/soph_rtc.ko
+	fi
+}
+
+function load_soph_stitch_ko()
+{
+	echo load soph_stitch ko ...
+	if [ -f /mnt/system/ko/soph_stitch.ko ]; then
+		insmod /mnt/system/ko/soph_stitch.ko
+	fi
+}
+
+function load_soph_sys_ko()
+{
+	echo load soph_sys ko ...
+	if [ -f /mnt/system/ko/soph_sys.ko ]; then
+		insmod /mnt/system/ko/soph_sys.ko
+	fi
+}
+
+function load_soph_vpss_ko()
+{
+	echo load soph_vpss ko...
+	if [ -f /mnt/system/ko/soph_vpss.ko ]; then
+		insmod /mnt/system/ko/soph_vpss.ko
+	fi
+}
+
+function load_soph_drm_ko()
+{
+	echo load soph_drm ko	...
+	if [ -f /mnt/system/ko/soph_drm.ko ]; then
+		insmod /mnt/system/ko/soph_drm.ko
+	fi
+}
+
+function load_g_serial_ko()
+{
+	echo load g_serial ko...
+	if [ -f /mnt/system/ko/g_serial.ko ]; then
+		insmod /mnt/system/ko/g_serial.ko
+	fi
+}
+
+function load_usb_f_obex_ko()
+{
+	echo load usb_f_obex ko ...
+	if [ -f /mnt/system/ko/usb_f_obex.ko ]; then
+		insmod /mnt/system/ko/usb_f_obex.ko
+	fi
+}
+
+function load_usb_f_serial_ko()
+{
+	echo load usb_f_serial ko ...
+	if [ -f /mnt/system/ko/usb_f_serial.ko ]; then
+		insmod /mnt/system/ko/usb_f_serial.ko
+	fi
+}
+
+function load_soph_vc_drv_ko()
+{
+	echo load soph_vc_drv ko	...
+	if [ -f /mnt/system/ko/soph_vc_drv.ko ]; then
+		insmod /mnt/system/ko/soph_vc_drv.ko
+	fi
+}
+
+function load_soph_ldc_ko()
+{
+        echo load soph_ldc ko ...
+        if [ -f /mnt/system/ko/soph_ldc.ko ]; then
+                insmod /mnt/system/ko/soph_ldc.ko
+        fi
+}
+
+function load_ethernet_ko()
+{
+        echo load ethernet ko ...
+        if [ -f /mnt/system/ko/r8169.ko ]; then
+                insmod /mnt/system/ko/r8169.ko
+        fi
+        if [ -f /mnt/system/ko/igb.ko ]; then
+                insmod /mnt/system/ko/igb.ko
+        fi
+}
+
+case "$1" in
+  start)
+        echo "init mpp system..."
+	load_soph_base_ko
+	load_soph_sys_ko
+	load_soph_vpss_ko
+	load_soph_dwa_ko
+	load_soph_clock_cooling_ko
+	load_soph_vc_drv_ko
+	load_soph_rtc_ko
+	load_soph_ive_ko
+	echo load bmrt ko ...
+	load_ko
+	load_soph_2d_engine_ko
+	load_soph_pwm_ko
+	load_soph_saradc_ko
+	load_soph_dpu_ko
+	load_soph_stitch_ko
+	load_soph_drm_ko
+	# load_g_serial_ko
+	# load_usb_f_obex_ko
+	# load_usb_f_serial_ko
+	load_soph_ldc_ko
+	load_ethernet_ko
+        ;;
+  stop)
+        ;;
+  restart|reload)
+        ;;
+  *)
+        echo "Usage: $0 {start|stop|restart}"
+        exit 1
+esac
+
+exit $?

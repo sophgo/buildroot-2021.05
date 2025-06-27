@@ -7,8 +7,8 @@
 /.config
 *.depend
 *.o
-/*.patch
-/*.diff
+# /*.patch
+# /*.diff
 *.orig
 *.rej
 *~
