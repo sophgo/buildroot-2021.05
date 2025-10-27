@@ -111,7 +111,9 @@ function copy_libsophon_buildroot()
 				chmod 644 "${TARGET_PROFILE_D_DIR}/$(basename "$file")"
 			done
 	[[ -f "$PROFILE_SCRIPT" ]] && chmod 644 "$PROFILE_SCRIPT"
-	find $BOARDDIR/sophon/$latest_ver/data/ -name bm1688_firmware* -exec ln -srf {} $BOARDDIR/../lib/firmware/ \;
+
+	find $BOARDDIR/sophon/$latest_ver/data/ -name bm1688_firmware* -exec ln -snrf {} $BOARDDIR/../lib/firmware/ \;
+
 	popd || return 1
 }
 
